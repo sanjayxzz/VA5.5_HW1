@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get and Post</title>
+</head>
+  
+<body>  
+  <h1>Get and Post</h1>
+  <h2>Get Request</h2>
+  <button id="getData">Get Data</button><br><br>
+  <ul id="listData"></ul>
+  <div id="getDataContainer"></div>
+  <h2>Post Request</h2>
+  <form id="postForm">
+    <label for="name">Name:</label>
+    <input id="name"/><br><br>
+    <label for="message">Message:</label>
+    <input id="message"/><br><br>
+    <button type="submit">Submit</button>
+  </form>
+  <div id="responseContainer"></div>
+
+  <script>
+    const postForm = document.querySelector("#postForm");
+    const name = document.querySelector("#name");
+    const message = document.querySelector("#message");
+    const responseContainer = document.querySelector("#responseContainer");
+    const getData = document.querySelector("#getData");
+    const listData = document.querySelector("#listData");
+    const getDataContainer = document.querySelector("#getDataContainer");
+    const apiUrl = 'https://posts-student-neog.replit.app/posts';
+
+    getData.addEventListener("click", function(){
+      listData.innerHTML = ''; // Clear the list before adding new items
+      fetch(apiUrl).then(function(response){
+        return response.json();
+      }).then(function(data){
+        if(data){
+          for(let i = 0; i < data.length; i++){
+            const liElement = document.createElement('li');
+            liElement.textContent = `${data[i].name} (message: ${data[i].message})`;
+            listData.appendChild(liElement);
+          }
+        } else {
+          getDataContainer.textContent = "Failed to get data.";
+        }
+      }).catch(function(error){
+        getDataContainer.textContent = "An error occurred while getting data.";
+      });
+    });
+    
+    postForm.addEventListener("submit", function(event){
+      event.preventDefault();
+      const requestData = {
+        name: name.value,
+        message: message.value
+      };
+      fetch(apiUrl, {
+        method: "POST",
+        body: JSON.stringify(requestData),
+        headers: {
+          "Content-Type" : "application/json"
+        }
+      }).then(function(response){
+        return response.json();
+      }).then(function(data){
+        if(data){
+          responseContainer.textContent = JSON.stringify(data);
+        } else {
+          responseContainer.textContent = "Failed to make the POST call.";
+        }
+      }).catch(function(error){
+        responseContainer.textContent = "An error occurred while making the POST call.";
+      });
+    });
+  </script>
+</body>
+</html>
+
